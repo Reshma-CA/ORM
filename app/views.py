@@ -6,30 +6,41 @@ from . models import Movieinfo
 from .forms import MovieForm
 # Create your views here.
 
+# def Movie(request):
+#     frm = MovieForm()
+#     if request.POST:
+#         title  = request.POST.get('title')
+#         year = request.POST.get('year')
+#         descr = request.POST.get('description')
+        
+        
+#         obj = Movieinfo(title=title, year=year, description=descr)
+#         obj.save() 
+
+#         ''' # Create and save a Movieinfo object if data is received
+#         if title and year and descr:
+#             obj = Movieinfo(title=title, year=year, description=descr)
+#             obj.save()
+#             # Optionally, you can redirect to a success page or render another template
+#             return render(request, 'success.html')'''
+#         if title and year and descr :
+#             return render(request, 'success.html')
+#         else:
+#             frm = MovieForm()
+
+#     return render(request, 'index.html',{'frm':frm})
+
 def Movie(request):
-    frm = MovieForm()
-    if request.POST:
-        title  = request.POST.get('title')
-        year = request.POST.get('year')
-        descr = request.POST.get('description')
-        
-        
-        obj = Movieinfo(title=title, year=year, description=descr)
-        obj.save() 
-
-        ''' # Create and save a Movieinfo object if data is received
-        if title and year and descr:
-            obj = Movieinfo(title=title, year=year, description=descr)
-            obj.save()
+    if request.method == 'POST':
+        frm = MovieForm(request.POST,request.FILES)
+        if frm.is_valid():
+            frm.save()  # This will save the form data to the database
             # Optionally, you can redirect to a success page or render another template
-            return render(request, 'success.html')'''
-        if title and year and descr :
             return render(request, 'success.html')
-        else:
-            frm = MovieForm()
-
-    return render(request, 'index.html',{'frm':frm})
-
+    else:
+        frm = MovieForm()
+    
+    return render(request, 'index.html', {'frm': frm})
       
 def data_view(request):
     data_view = Movieinfo.objects.all()
@@ -61,7 +72,7 @@ def data_view(request):
 
 # This is a ModelForm based edit
 
-def edit(request,id):
+'''def edit(request,id):
     edit_obj = Movieinfo.objects.get(id=id)
     if request.POST:
         frm = MovieForm(request.POST,instance = edit_obj)
@@ -71,7 +82,24 @@ def edit(request,id):
             
     else:
         frm = MovieForm(instance = edit_obj)
-    return render(request,'index.html',{'frm':frm})
+    return render(request,'index.html',{'frm':frm})'''
+
+from django.shortcuts import get_object_or_404, redirect
+
+def edit(request, id):
+    edit_obj = get_object_or_404(Movieinfo, id=id)
+
+    if request.method == 'POST':
+        frm = MovieForm(request.POST, request.FILES, instance=edit_obj)
+        if frm.is_valid():
+            frm.save()
+            # Optionally, you can redirect to a success page or render another template
+            return render(request,'success.html')  # Replace 'success' with your success URL name
+    else:
+        frm = MovieForm(instance=edit_obj)
+    
+    return render(request, 'index.html', {'frm': frm})  # Assuming you have an 'edit.html' template
+
 
 def delete(request,id):
     delete_obj = Movieinfo.objects.get(id = id)

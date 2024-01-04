@@ -7,28 +7,46 @@
     <title>Success</title>
     <!-- Add your CSS styles or link to a CSS file here -->
     <style>
-        /* Example CSS styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+        /* Style the container */
+.container {
+    width: 80%;
+    margin: 0 auto;
+}
 
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-        }
+/* Style the table */
+.movie-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        .success-message {
-            text-align: center;
-            font-size: 24px;
-            color: #007bff;
-        }
+/* Style table header */
+.movie-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+    padding: 8px;
+}
+
+/* Style table data */
+.movie-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* Alternate row color */
+.movie-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style links */
+a {
+    text-decoration: none;
+    color: blue;
+}
+a:hover {
+    text-decoration: underline;
+    color: red;
+}
+
     </style>
 </head>
 
@@ -39,31 +57,51 @@
         <h1>Movies list</h1>
     </div>
 
-    <div class='container'>
+    <div class="container">
+        <table class="movie-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Year</th>
+                    <th>Description</th>
+                    <th>Movie Poster</th>
+                    <th>Director</th>
+                    <th>Censor Details</th>
+                    <th>Actor</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                <tr>
+                    <td>{{ movie.title | title }}</td>
+                    <td>{{ movie.year }}</td>
+                    <td>{{ movie.description | default:'No data available' }}</td>
+                    <td>
+                        {% if movie.poster %}
+                            <img src="{{ movie.poster.url }}" alt="Movie Poster">
+                        {% else %}
+                            No poster available
+                        {% endif %}
+                    </td>
+                    <td>{{ movie.directed_by.name }}</td>
+                    <td>{{ movie.censor_datails.certified_by }}</td>
+                    {% comment %} <td>{{ movie.actors.name }}</td> {% endcomment %}
 
-        <table>
-            <tr><th>Title</th><th>Year</th><th>Description</th><th>Movie poster</th><th>Edit</th><th>/Delete</th></tr>
-
-        {% for i in movies%}
-        <tr>
-            <td><h3> {{i.title | upper}}</h3></td>
-            <td><h3>{{i.year}}</h3></td>
-            <td><h3>{{i.description | default:'No data available'}}</h3></td>
-            
-            {% if i.poster %}
-            <td><img src="{{ i.poster.url }}" alt="Movie Poster"></td>
-            {% endif %}
-            <td><a href="{% url 'edit' i.id %}"> Edit</a></td>
-            <td><a href="{% url 'delete' i.id %}">Delete</a></td>
-
-        
-        
-        
-     
-
-       </tr>
-        {% endfor %}
-    </table>
+                    <td>
+                        {% for actor in movie.actors.all %}
+                            {{ actor.name }}
+                            {% if not forloop.last %}, {% endif %} <!-- Add comma if it's not the last actor -->
+                        {% endfor %}
+                    </td>
+                    
+                    <td><a href="{% url 'edit' movie.id %}">Edit</a></td>
+                    <td><a href="{% url 'delete' movie.id %}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     
 </body>
